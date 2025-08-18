@@ -110,9 +110,9 @@ void runBreakTheBricks()
   // Clear the shared lcd (defined in UI.ino).
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Break Bricks");
+  lcd.print("  Break Bricks  ");
   lcd.setCursor(0, 1);
-  lcd.print("Press SELECT");
+  lcd.print(" >Press SELECT< ");
 
   // Wait for user to press SELECT before starting.
   while (BB_read_LCD_buttons() != BB_btnSELECT) {
@@ -276,7 +276,7 @@ static void BB_handlecollisions()
       if (left < 1) {
         // Win
         lcd.clear();
-        lcd.print("You Win! ");
+        lcd.print("    You Win!    ");
         // BB_arkanoidsong();
         lcd.print(BB_score);
         delay(15000);
@@ -299,34 +299,4 @@ static void BB_handlecollisions()
       BB_score--;
     }
   }
-}
-
-// Optional Arkanoid song (comment out if no speaker)
-static void BB_arkanoidsong()
-{
-  // Example:
-  /*
-  tone(BB_musicpin, 1568, BB_eight); // g6
-  delay(BB_eight);
-  noTone(BB_musicpin);
-  delay(BB_sixteenth);
-
-  tone(BB_musicpin, 1568, BB_sixteenth);
-  delay(BB_sixteenth);
-  tone(BB_musicpin, 1864, BB_half); // a#6
-  delay(BB_half);
-  noTone(BB_musicpin);
-  delay(BB_thirty2);
-
-  tone(BB_musicpin, 1760, BB_eight); // a6
-  delay(BB_eight);
-  tone(BB_musicpin, 1568, BB_eight); // g6
-  delay(BB_eight);
-  tone(BB_musicpin, 1396, BB_eight); // f6
-  delay(BB_eight);
-  tone(BB_musicpin, 1760, BB_eight); // a6
-  delay(BB_eight);
-  tone(BB_musicpin, 1568, BB_half);
-  delay(BB_half);
-  */
 }

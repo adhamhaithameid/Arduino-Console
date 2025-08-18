@@ -321,9 +321,9 @@ static void SN_gameOverFunction()
   lcd.clear();
   SN_freeList();
   lcd.setCursor(3,0);
-  lcd.print("Game Over!");
+  lcd.print("   Game  Over!  ");
   lcd.setCursor(4,1);
-  lcd.print("Score: ");
+  lcd.print("   Score: ");
   lcd.print(SN_collected);
   delay(1000);
 }

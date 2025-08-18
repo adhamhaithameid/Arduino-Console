@@ -1,6 +1,7 @@
 void runHelicopterGame() {
   const int UP_BUTTON = 131;
   const int DOWN_BUTTON = 309;
+  const int BTN_SELECT = 790;
   
   int heliRow = 0;
   int obstacleX[5];
@@ -38,9 +39,9 @@ void runHelicopterGame() {
   
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Hekicopter Game");
+  lcd.print("Helicopter  Game");
   lcd.setCursor(0, 1);
-  lcd.print("Press SELECT");
+  lcd.print(" >Press SELECT< ");
   while (read_LCD_buttons() != BTN_SELECT) { delay(50); }
   
   while (true) {
@@ -73,12 +74,12 @@ void runHelicopterGame() {
     if (gameOver) {
       lcd.clear();
       lcd.setCursor(3, 0);
-      lcd.print(" GAME OVER ");
+      lcd.print("   GAME  OVER   ");
       lcd.setCursor(2, 1);
-      lcd.print("> PRESS UP <");
+      lcd.print(" >Press SELECT< ");
       while (true) {
         int val = analogRead(A0);
-        if (val > (UP_BUTTON - 10) && val < (UP_BUTTON + 10)) {
+        if (val > (BTN_SELECT - 10) && val < (BTN_SELECT + 10)) {
           resetGame();
           gameOver = false;
           break;
@@ -88,3 +89,7 @@ void runHelicopterGame() {
     }
   }
 }
+
+
+// UI integration wrapper
+void runHelicopter() { runHelicopterGame(); }

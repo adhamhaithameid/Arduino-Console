@@ -131,7 +131,7 @@ static void HMD_showIntro()
   lcd.setCursor(0, 0);
   lcd.print("How Many Days?");
   lcd.setCursor(1, 1);
-  lcd.print("> Press Select <");
+  lcd.print(" >Press SELECT< ");
 }
 
 // Show "Event Date" selection screen
@@ -164,19 +164,19 @@ static void HMD_showResult()
     lcd.print("Days Until:");
     lcd.setCursor(0, 1);
     lcd.print(totalDays);
-    lcd.print(" days");
+    lcd.print(" days!");
   }
   else if (viewMode == HMD_MONTHS) {
     lcd.print("Months Until:");
     lcd.setCursor(0, 1);
     lcd.print(totalDays / 30); // approximate
-    lcd.print(" months");
+    lcd.print(" months!");
   }
   else if (viewMode == HMD_YEARS) {
     lcd.print("Years Until:");
     lcd.setCursor(0, 1);
     lcd.print(totalDays / 365); // approximate
-    lcd.print(" years");
+    lcd.print(" years!");
   }
 }
 
@@ -287,3 +287,7 @@ static void HMD_handleResultScreen()
     delay(250);
   }
 }
+
+
+// UI integration wrapper
+void runHowManyDays() { runHowManyDaysUntil(); }

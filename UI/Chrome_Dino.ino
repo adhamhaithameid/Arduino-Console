@@ -1,40 +1,39 @@
-/* Chrome Dino
- * Dino sprite style: T-Rex chunky v2 (cleaner head, bigger foot, spiky tail) — Chrome-like silhouette (4-cell dino)
- * Hardware: Arduino Uno + 16x2 LCD Keypad Shield (A0 buttons)
- * Controls: UP or SELECT to jump; SELECT to start/restart
- * Sprite:
- *   Two-cell dino style (CREA ELECTRONICA look) with alternate feet; cactus obstacle.
- */
+#ifdef EMBED_DINO_IN_UI
+#define setup dinoSetup
+#define loop  runChromeDino
+extern LiquidCrystal lcd;
+extern int read_LCD_buttons();
+#endif
 
 #include <LiquidCrystal.h>
+const uint8_t DINO_BTN_RIGHT = 0;
+const uint8_t DINO_BTN_UP = 1;
+const uint8_t DINO_BTN_DOWN = 2;
+const uint8_t DINO_BTN_LEFT = 3;
+const uint8_t DINO_BTN_SELECT = 4;
+const uint8_t DINO_BTN_NONE = 5;
+#ifndef EMBED_DINO_IN_UI
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
+#endif
 
 // ---- Buttons via A0 ----
-#define BTN_RIGHT  0
-#define BTN_UP     1
-#define BTN_DOWN   2
-#define BTN_LEFT   3
-#define BTN_SELECT 4
-#define BTN_NONE   5
-
+#ifndef EMBED_DINO_IN_UI
 int read_LCD_buttons() {
   int adc = analogRead(A0);
   if (adc < 50)   return BTN_RIGHT;
   if (adc < 195)  return BTN_UP;
   if (adc < 380)  return BTN_DOWN;
   if (adc < 555)  return BTN_LEFT;
-  if (adc < 790)  return BTN_SELECT;
+  if (adc < 790)  return DINO_BTN_SELECT;
   return BTN_NONE;
 }
+#endif
 
-// Keep your inline style
-static inline bool isJumpPressed(){ int b = read_LCD_buttons(); return (b == BTN_UP || b == BTN_SELECT); }
+static inline bool isJumpPressed(){ int b = read_LCD_buttons(); return (b == DINO_BTN_UP || b == DINO_BTN_SELECT); }
 
 // ---- Custom characters ----
-// Index map: 0 HEAD, 1 CHEST_ARM, 2 LEGS_RUN1, 3 TAIL, 4 LEGS_RUN2, 5 LEGS_JUMP, 6 CACTUS
+// Index map: 0/1 right foot, 2/3 left foot, 4/5 idle, 6 cactus, 7 bird (animated)
 
-// Head with snout (right), eye hole, jaw and neck
-// ---- Single-cell dino frames ----
 // ---- Cactus ----
 byte CACTUS[8] = {
   B00100,
@@ -85,27 +84,19 @@ State state = START;
 const uint8_t DINO_COL1 = 1;
 const uint8_t DINO_COL2 = 2;
 
-
-// Dino placement (single cell at column DINO_COL)
-// HEAD
-// CHEST/ARM
-// LEGS (anim)
-// TAIL
 uint8_t dinoRow = 1;         // 0 = top, 1 = bottom
 bool footSwap = false;       // toggle run frames
 
-// Obstacle
+// Obstacles
 int8_t cactusCol = 15;
 bool cactusActive = false;
 
-// Upper obstacle (bird)
 int8_t birdCol = 15;
 bool birdActive = false;
 
 // Difficulty/scaling
 uint8_t cactusSpawnChance = 2; // out of 10
 uint8_t birdSpawnChance   = 0; // out of 10 (starts at 0 until score threshold)
-
 
 // Timing
 unsigned long lastTick = 0;
@@ -129,7 +120,7 @@ void drawScore() {
 }
 
 void showHUD() {
-  lcd.setCursor(8, 0); lcd.print("S:");
+  lcd.setCursor(15, 0);
   drawScore();
 }
 
@@ -137,8 +128,6 @@ void clearDinoRow(uint8_t row) {
   lcd.setCursor(DINO_COL1, row);
   lcd.print("  ");
 }
-
-
 
 void drawDino() {
   // Alternate legs; during jump we can keep alternating for effect
@@ -148,8 +137,6 @@ void drawDino() {
   lcd.setCursor(DINO_COL1, dinoRow); lcd.write(byte(leftIdx));
   lcd.setCursor(DINO_COL2, dinoRow); lcd.write(byte(rightIdx));
 }
-
-
 
 inline void spawnCactus(){ cactusCol = 15; cactusActive = true; }
 inline void eraseCactus(int8_t c){ if (c>=0 && c<16){ lcd.setCursor(c,1); lcd.print(' ');} }
@@ -179,16 +166,23 @@ void updateDifficulty() {
   else if (score < 60) { cactusSpawnChance = 5; birdSpawnChance = 4; }
   else { cactusSpawnChance = 6; birdSpawnChance = 5; } // still out of 10
 }
+
 bool checkCollision() {
   if (dinoRow == 1) { // ground: cactus
     if (cactusActive && (cactusCol >= DINO_COL1 && cactusCol <= DINO_COL2)) return true;
   } else { // top: bird
     if (birdActive && (birdCol >= DINO_COL1 && birdCol <= DINO_COL2)) return true;
   }
-
   return false;
 }
 
+inline void enterGameOver() {
+  state = GAMEOVER;
+  jumping = false;
+  footSwap = false;
+  lcd.setCursor(0, 0); lcd.print("   GAME  OVER   ");
+  lcd.setCursor(0, 1); lcd.print("   Score: "); lcd.print(score); lcd.print("    ");
+}
 
 void resetGame(bool toStart) {
   lcd.clear();
@@ -199,10 +193,12 @@ void resetGame(bool toStart) {
   dinoRow = 1;
   cactusActive = false;
   cactusCol = 15;
+  birdActive = false;
+  birdCol = 15;
 
   if (toStart) {
     lcd.setCursor(0, 0); lcd.print("  CHROME  DINO  ");
-    lcd.setCursor(0, 1); lcd.print(" Press SELECT   ");
+    lcd.setCursor(0, 1); lcd.print(" >Press SELECT< ");
     state = START;
   } else {
     showHUD();
@@ -212,8 +208,8 @@ void resetGame(bool toStart) {
 
 void setup() {
   lcd.begin(16, 2);
-    randomSeed(analogRead(A0));
-// 0/1 = right foot; 2/3 = left foot; 4/5 = idle; 6 = cactus
+  randomSeed(analogRead(A0));
+  // 0/1 = right foot; 2/3 = left foot; 4/5 = idle; 6 = cactus
   lcd.createChar(0, DINO_PIE_DERE_PART_1);
   lcd.createChar(1, DINO_PIE_DERE_PART_2);
   lcd.createChar(2, DINO_PIE_IZQU_PART_1);
@@ -224,11 +220,10 @@ void setup() {
   resetGame(true);
 }
 
-
 void loop() {
   switch (state) {
     case START: {
-      if (read_LCD_buttons() == BTN_SELECT) {
+      if (read_LCD_buttons() == DINO_BTN_SELECT) {
         lcd.clear();
         showHUD();
         state = RUN;
@@ -300,16 +295,14 @@ void loop() {
 
         // Collision
         if (checkCollision()) {
-          state = GAMEOVER;
-          lcd.setCursor(0, 0); lcd.print("   GAME  OVER   ");
-          lcd.setCursor(0, 1); lcd.print("Score: "); lcd.print(score);
-          lcd.print("  SEL=Again ");
+          enterGameOver();
+          return;
         }
       }
     } break;
 
     case GAMEOVER: {
-      if (read_LCD_buttons() == BTN_SELECT) {
+      if (read_LCD_buttons() == DINO_BTN_SELECT) {
         resetGame(true);
       }
     } break;
