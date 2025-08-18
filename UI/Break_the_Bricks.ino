@@ -107,17 +107,7 @@ static void BB_arkanoidsong();
 //-------------------------------------------------------------------
 void runBreakTheBricks()
 {
-  // Clear the shared lcd (defined in UI.ino).
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("  Break Bricks  ");
-  lcd.setCursor(0, 1);
-  lcd.print(" >Press SELECT< ");
-
-  // Wait for user to press SELECT before starting.
-  while (BB_read_LCD_buttons() != BB_btnSELECT) {
-    delay(10);
-  }
+  
 
   // Optional short beep or delay
   delay(200);

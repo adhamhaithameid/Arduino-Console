@@ -129,8 +129,8 @@ static void HMD_showIntro()
 {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("How Many Days?");
-  lcd.setCursor(1, 1);
+  lcd.print(" How Many Days? ");
+  lcd.setCursor(0, 1);
   lcd.print(" >Press SELECT< ");
 }
 

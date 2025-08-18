@@ -49,21 +49,12 @@ void runDecisionCompass()
   // Initialize random
   randomSeed(analogRead(A1));
 
-  // Clear the shared lcd from UI.ino
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Decision Compass");
-
   // Main loop: press SELECT to pick random response, press RIGHT/LEFT to scroll
   while (true) {
     int buttonValue = analogRead(A0);
 
-    // If user presses SELECT
-    if (buttonValue > (DC_SELECT_BUTTON - 10) && buttonValue < (DC_SELECT_BUTTON + 10)) {
       DC_showRandomResponse();
-      delay(500);
-    }
-
+    
     // If user presses RIGHT
     if (buttonValue > (DC_RIGHT_BUTTON - 10) && buttonValue < (DC_RIGHT_BUTTON + 10)) {
       DC_scrollText(1);

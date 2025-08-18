@@ -1,8 +1,10 @@
 void runHelicopterGame() {
   const int UP_BUTTON = 131;
   const int DOWN_BUTTON = 309;
-  const int BTN_SELECT = 790;
-  
+
+  extern int read_LCD_buttons();
+  const int BTN_SELECT_ENUM = 4;
+
   int heliRow = 0;
   int obstacleX[5];
   int obstacleY[5];
@@ -38,11 +40,6 @@ void runHelicopterGame() {
   resetGame();
   
   lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Helicopter  Game");
-  lcd.setCursor(0, 1);
-  lcd.print(" >Press SELECT< ");
-  while (read_LCD_buttons() != BTN_SELECT) { delay(50); }
   
   while (true) {
     int btnVal = analogRead(A0);
@@ -73,13 +70,13 @@ void runHelicopterGame() {
     delay(200);
     if (gameOver) {
       lcd.clear();
-      lcd.setCursor(3, 0);
+      lcd.setCursor(0, 0);
       lcd.print("   GAME  OVER   ");
-      lcd.setCursor(2, 1);
+      lcd.setCursor(0, 1);
       lcd.print(" >Press SELECT< ");
       while (true) {
         int val = analogRead(A0);
-        if (val > (BTN_SELECT - 10) && val < (BTN_SELECT + 10)) {
+        if (read_LCD_buttons() == BTN_SELECT_ENUM) {
           resetGame();
           gameOver = false;
           break;
