@@ -84,6 +84,9 @@ UI/
 3. **Upload**. Use **UP/DOWN** to navigate, **SELECT** to launch a game.  
 4. Idle on the menu for **30 s** to see the **Eye Animation** screensaver.
 
+## 🎥 Video Demo
+- see the video demo of the project [here](https://youtu.be/lyNDa8WgvO4)
+
 ## 🧪 Build Tips & Troubleshooting
 - **“Multiple libraries found for LiquidCrystal”**: Info message; the IDE picks one. Remove duplicates to silence.
 - **Macro clashes (`BTN_SELECT`)**: V2 uses **`UI_BTN_*`** in the UI and **`DINO_BTN_*`** in Dino to avoid conflicts.
